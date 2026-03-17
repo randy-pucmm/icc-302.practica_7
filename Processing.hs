@@ -1,36 +1,28 @@
--- Responsable del procesamiento funcional de datos
 module Processing where
+-- import Test
+import Data.List (foldl')
 
-a :: [(String, Double)]
-a = [("Laptop", 800), ("Mouse", 25), ("Teclado", 40), ("Monitor", 200)]
-
--- Calcula el precio promedio
 averagePrice :: [(String, Double)] -> Double
-averagePrice items
-  | null items = 0
-  | otherwise = sum (map snd items) / fromIntegral (length items)
+averagePrice [] = 0
+averagePrice items =
+  let total = foldl' (\acc (_, p) -> acc + p) 0 items
+      count = length items
+   in total / fromIntegral count
 
--- Producto con mayor precio
 maxProduct :: [(String, Double)] -> (String, Double)
-maxProduct = foldl1 (\(product1, price1) (product2, price2) -> if price1 > price2 then (product1, price1) else (product2, price2))
+maxProduct [] = ("", 0)
+maxProduct (x : xs) =
+  foldl' (\acc item -> if snd item > snd acc then item else acc) x xs
 
--- Producto con menor precio
 minProduct :: [(String, Double)] -> (String, Double)
-minProduct = foldl1 (\(product1, price1) (product2, price2) -> if price1 < price2 then (product1, price1) else (product2, price2))
+minProduct [] = ("", 0)
+minProduct (x : xs) =
+  foldl' (\acc item -> if snd item < snd acc then item else acc) x xs
 
--- Convierte la lista en texto para mostrar en consola
 formatProducts :: [(String, Double)] -> String
-formatProducts items = unlines (map (\(name, price) -> name ++ " - " ++ show price) items)
+formatProducts =
+  foldr (\(name, price) acc -> name ++ " - " ++ show price ++ "\n" ++ acc) ""
 
--- Debe producir un informe como:
-{--
-    Cantidad de productos: 4
-    Precio promedio: 266.25
-    Producto más caro:
-    Laptop - 800
-    Producto más barato:
-    Mouse - 25
---}
 generateReport :: [(String, Double)] -> String
 generateReport items =
   "Cantidad de productos: "
@@ -38,14 +30,14 @@ generateReport items =
     ++ "\n"
     ++ "Precio promedio: "
     ++ show (averagePrice items)
-    ++ "\n"
-    ++ "Producto más caro: \n"
+    ++ "\n\n"
+    ++ "Producto mas caro:\n"
     ++ formatProducts [maxProduct items]
-    ++ "Producto más barato: \n"
+    ++ "\n"
+    ++ "Producto mas barato:\n"
     ++ formatProducts [minProduct items]
 
--- Seleccionar producto de forma segura (el índice existe).
 selectProduct :: [(String, Double)] -> Int -> Either String (String, Double)
 selectProduct items idx
-  | idx < 0 || idx >= length items = Left "El indice no existe"
-  | otherwise = Right (items !! idx)
+  | idx >= 0 && idx < length items = Right (items !! idx)
+  | otherwise = Left "Indice invalido"

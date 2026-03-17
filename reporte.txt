@@ -1,0 +1,8 @@
+Cantidad de productos: 4
+Precio promedio: 266.25
+
+Producto mas caro:
+Laptop - 800.0
+
+Producto mas barato:
+Mouse - 25.0
